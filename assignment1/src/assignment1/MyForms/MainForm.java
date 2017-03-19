@@ -56,7 +56,7 @@ public class MainForm extends JFrame {
 		btnAES.setBounds(227, 10, 117, 47);
 		contentPane.add(btnAES);
 		
-		JButton btnExit = new JButton("Bb Khiet day");
+		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
