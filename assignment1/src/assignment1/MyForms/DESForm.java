@@ -393,7 +393,8 @@ public class DESForm extends JFrame {
 				folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				folderChooser.setAcceptAllFileFilterUsed(false);
 				folderChooser.showSaveDialog(null);
-				FILE_PATH = folderChooser.getCurrentDirectory().getAbsolutePath();
+				if(System.getProperties().getProperty("os.name").contains("Windows")) FILE_PATH = folderChooser.getSelectedFile().getAbsolutePath();
+				else FILE_PATH = folderChooser.getCurrentDirectory().getAbsolutePath();
 				pathTextField.setText(FILE_PATH);
 			}
 		});
@@ -547,7 +548,7 @@ public class DESForm extends JFrame {
 				if (!outputDirectory.exists()){ //folder non-exist
 					boolean createDirectory = outputDirectory.mkdir();
 					if (createDirectory) {
-						System.out.println("Create output directory successfully");
+						System.out.println("Create output directory successfully - Encrypt all files in folder");
 						//Create result files here
 						File file;
 						if (operationSystemName.contains("Windows")) file = new File(outputDirectory.getAbsolutePath() + "\\" + DES_FILE_NAME);
@@ -606,7 +607,6 @@ public class DESForm extends JFrame {
 					fileStream.close();
 					
 					// Append to file info here
-					System.out.println("Writing down your info!");
 					File info;
 					if (operationSystemName.contains("Windows")) info = new File(outputDirectory.getAbsolutePath() + "\\" + "info.txt");
 					else info = new File(outputDirectory.getAbsolutePath() + "/" + "info.txt");
