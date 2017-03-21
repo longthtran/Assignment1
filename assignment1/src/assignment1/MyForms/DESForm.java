@@ -40,11 +40,10 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.SwingConstants;
-import javax.swing.JTextArea;
 
 public class DESForm extends JFrame {
 
@@ -55,7 +54,7 @@ public class DESForm extends JFrame {
 	private JLabel lblNote1;
 	
 	private JTextField keyTextField;
-	private JTextField inputTextField;
+	private JTextField pathTextField;
 	private JTextField outputTextField;
 	private JTextField ivTextField;
 	
@@ -107,7 +106,7 @@ public class DESForm extends JFrame {
 		lblKey.setBounds(26, 21, 94, 16);
 		contentPane.add(lblKey);
 
-		JLabel lblInput = new JLabel("Input");
+		JLabel lblInput = new JLabel("Path");
 		lblInput.setBounds(26, 49, 61, 16);
 		contentPane.add(lblInput);
 
@@ -126,8 +125,8 @@ public class DESForm extends JFrame {
 		contentPane.add(keyTextField);
 		keyTextField.setColumns(10);
 
-		inputTextField = new JTextField();
-		inputTextField.getDocument().addDocumentListener(new DocumentListener() {
+		pathTextField = new JTextField();
+		pathTextField.getDocument().addDocumentListener(new DocumentListener() {
 			
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -147,10 +146,10 @@ public class DESForm extends JFrame {
 				
 			}
 		});
-		inputTextField.setEditable(false);
-		inputTextField.setColumns(10);
-		inputTextField.setBounds(122, 44, 219, 26);
-		contentPane.add(inputTextField);
+		pathTextField.setEditable(false);
+		pathTextField.setColumns(10);
+		pathTextField.setBounds(122, 44, 219, 26);
+		contentPane.add(pathTextField);
 
 		outputTextField = new JTextField();
 		outputTextField.setEditable(false);
@@ -164,7 +163,7 @@ public class DESForm extends JFrame {
 				DES_MODE  = myComboBox.getSelectedItem().toString();
 				DES_OPT = myGroupButton.getSelection().getActionCommand();
 				DES_FILE_NAME = PLAIN_FILE_NAME + "_" + DES_OPT;
-				FILE_PATH = inputTextField.getText();
+				FILE_PATH = pathTextField.getText();
 				DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 				Date dateExecute = new Date();
 				outputFolderName = dateFormat.format(dateExecute);
@@ -181,7 +180,7 @@ public class DESForm extends JFrame {
 						// get base64 encoded version of the key
 						String encodedKey = Base64.getEncoder().encodeToString(key.getEncoded());
 						keyTextField.setText(encodedKey);
-						System.out.println("Your key is: " + encodedKey.length() + " long");
+						System.out.println("Your key is " + encodedKey.length() + "  bytes long");
 					} catch (NoSuchAlgorithmException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -261,7 +260,7 @@ public class DESForm extends JFrame {
 							 */
 							String operationSystemName = System.getProperties().getProperty("os.name");
 							File info;
-							if (operationSystemName.contains("Windows Ubuntu")) info = new File(folder.getAbsolutePath() + "\\" + outputFolderName + "\\" + "info.txt");
+							if (operationSystemName.contains("Windows")) info = new File(folder.getAbsolutePath() + "\\" + outputFolderName + "\\" + "info.txt");
 							else info = new File(folder.getAbsolutePath() + "/" + outputFolderName + "/" + "info.txt");
 							FileWriter infoWriter = new FileWriter(info, true); //different here!
 							BufferedWriter bw = new BufferedWriter(infoWriter);
@@ -374,7 +373,7 @@ public class DESForm extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				if (fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					inputTextField.setText(file.getAbsolutePath());
+					pathTextField.setText(file.getAbsolutePath());
 					PLAIN_FILE_NAME = file.getName();
 					if(PLAIN_FILE_NAME.contains(".")) PLAIN_FILE_NAME = PLAIN_FILE_NAME.substring(0, PLAIN_FILE_NAME.lastIndexOf('.'));
 				}
@@ -395,7 +394,7 @@ public class DESForm extends JFrame {
 				folderChooser.setAcceptAllFileFilterUsed(false);
 				folderChooser.showSaveDialog(null);
 				FILE_PATH = folderChooser.getCurrentDirectory().getAbsolutePath();
-				inputTextField.setText(FILE_PATH);
+				pathTextField.setText(FILE_PATH);
 			}
 		});
 		btnOpenFolder.setBounds(311, 153, 117, 29);
@@ -449,7 +448,6 @@ public class DESForm extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				lblKey.setText("Key (12 bytes)");
 				
 				keyTextField.setEditable(true);
@@ -494,14 +492,13 @@ public class DESForm extends JFrame {
 		contentPane.add(lblNote1);
 	}
 
-	public void DESAlgorithm(String DES_OPTION, String DES_MODE) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, IOException {
+	private void DESAlgorithm(String DES_OPTION, String DES_MODE) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, IOException {
 		String operationSystemName = System.getProperties().getProperty("os.name");
 		try {
 			FILE_BYTES = Files.readAllBytes(Paths.get(FILE_PATH));
 			FILE_SIZE = FILE_BYTES.length;
 			System.out.println("You " + DES_OPT.toLowerCase() + " with mode " + DES_MODE);
 			Cipher cipher = null;
-			//cipher = Cipher.getInstance("DES/" + DES_MODE + "/PKCS5Padding");
 			
 			if(DES_OPTION.equals("Decrypt")) {
 				cipher = Cipher.getInstance("DES/" + DES_MODE + "/PKCS5Padding");
@@ -529,8 +526,7 @@ public class DESForm extends JFrame {
 					ivTextField.setText(encodedParams);
 				}
 			}
-			//if (DES_OPTION.equals("Decrypt")) cipher.init(Cipher.DECRYPT_MODE, key);
-			//else if (DES_OPTION.equals("Encrypt")) cipher.init(Cipher.ENCRYPT_MODE, key);
+
 
 			byte[] bytesOutputOfSegment;
 			long FILE_SEGMENT = FILE_SIZE/ 100;
@@ -538,11 +534,14 @@ public class DESForm extends JFrame {
 //			long times = FILE_SIZE/FILE_SEGMENT;
 //			long count = 0;
 			
-			//Create an output directory contains 2 file results
+			/*
+			 * Encrypt here
+			 */
 			if (DES_OPTION.equals("Encrypt")) {
+				//Create an output directory contains 2 file results
 				File outputDirectory;
 				//Create output directory here
-				if (operationSystemName.contains("Windows Ubuntu")) outputDirectory = new File(FILE_PATH.substring(0, FILE_PATH.lastIndexOf('\\')) + "\\" + outputFolderName);
+				if (operationSystemName.contains("Windows")) outputDirectory = new File(FILE_PATH.substring(0, FILE_PATH.lastIndexOf('\\')) + "\\" + outputFolderName);
 				else outputDirectory = new File(FILE_PATH.substring(0, FILE_PATH.lastIndexOf('/')) + "/" + outputFolderName);
 
 				if (!outputDirectory.exists()){ //folder non-exist
@@ -551,43 +550,19 @@ public class DESForm extends JFrame {
 						System.out.println("Create output directory successfully");
 						//Create result files here
 						File file;
-						if (operationSystemName.contains("Windows Ubuntu")) file = new File(outputDirectory.getAbsolutePath() + "\\" + DES_FILE_NAME);
+						if (operationSystemName.contains("Windows")) file = new File(outputDirectory.getAbsolutePath() + "\\" + DES_FILE_NAME);
 						else file = new File(outputDirectory.getAbsolutePath() + "/" + DES_FILE_NAME);
 						file.createNewFile();
 						
 						FileOutputStream fileStream = new FileOutputStream(file);
 						bytesOutputOfSegment = cipher.doFinal(FILE_BYTES);
 						fileStream.write(bytesOutputOfSegment);
-						fileStream.flush();
-//						int progressBarValue = 0;
-
-//						int from;
-//						int to;
-//						System.out.println("Please wait while executing!");
-//						while (progressBarValue < 100) {					
-//							from = (int)FILE_SEGMENT*progressBarValue;
-//							to = (int)FILE_SEGMENT*(progressBarValue + 1);
-//							bytesOutputOfSegment = cipher.doFinal(Arrays.copyOfRange(FILE_BYTES, from, to));
-//							fileStream.write(bytesOutputOfSegment);
-//							fileStream.flush();
-//							progressBarValue ++;							
-//						}
-//						
-//						//Processing the remain bytes
-//						cipher = Cipher.getInstance("DES/" + DES_MODE + "/PKCS5Padding");
-//						if(DES_OPTION.equals("Decrypt")) cipher.init(Cipher.DECRYPT_MODE, key);
-//						else if (DES_OPTION.equals("Encrypt")) cipher.init(Cipher.ENCRYPT_MODE, key);
-//						from = (int)FILE_SEGMENT*100;
-//						int range = (int)(FILE_SIZE - FILE_SEGMENT*100);
-//						bytesOutputOfSegment = cipher.doFinal(Arrays.copyOfRange(FILE_BYTES, from, from + range));
-//						fileStream.write(bytesOutputOfSegment);
-//						myProgressBar.setValue(100);
-						
+						fileStream.flush();				
 						fileStream.close();
+						
 						// Create file info here
-						System.out.println("Writing down your info!");
 						File info;
-						if (operationSystemName.contains("Windows Ubuntu")) info = new File(outputDirectory.getAbsolutePath() + "\\" + "info.txt");
+						if (operationSystemName.contains("Windows")) info = new File(outputDirectory.getAbsolutePath() + "\\" + "info.txt");
 						else info = new File(outputDirectory.getAbsolutePath() + "/" + "info.txt");
 						info.createNewFile();
 						FileWriter infoWriter = new FileWriter(info);
@@ -620,7 +595,7 @@ public class DESForm extends JFrame {
 				}
 				else { //folder existed
 					File file;
-					if (operationSystemName.contains("Windows Ubuntu")) file = new File(outputDirectory.getAbsolutePath() + "\\" + DES_FILE_NAME);
+					if (operationSystemName.contains("Windows")) file = new File(outputDirectory.getAbsolutePath() + "\\" + DES_FILE_NAME);
 					else file = new File(outputDirectory.getAbsolutePath() + "/" + DES_FILE_NAME);
 					file.createNewFile();
 					
@@ -633,7 +608,7 @@ public class DESForm extends JFrame {
 					// Append to file info here
 					System.out.println("Writing down your info!");
 					File info;
-					if (operationSystemName.contains("Windows Ubuntu")) info = new File(outputDirectory.getAbsolutePath() + "\\" + "info.txt");
+					if (operationSystemName.contains("Windows")) info = new File(outputDirectory.getAbsolutePath() + "\\" + "info.txt");
 					else info = new File(outputDirectory.getAbsolutePath() + "/" + "info.txt");
 					info.createNewFile();
 					FileWriter infoWriter = new FileWriter(info, true); //different here
@@ -645,36 +620,20 @@ public class DESForm extends JFrame {
 					bw.close();
 				}
 			}
+			/*
+			 * Decrypt here
+			 */
 			else if (DES_OPTION.equals("Decrypt")) {
 				File file;
-				if (operationSystemName.contains("Windows Ubuntu")) file = new File(FILE_PATH.substring(0, FILE_PATH.lastIndexOf("\\")) + "\\" + DES_FILE_NAME);
+				if (operationSystemName.contains("Windows")) file = new File(FILE_PATH.substring(0, FILE_PATH.lastIndexOf("\\")) + "\\" + DES_FILE_NAME);
 				else file = new File(FILE_PATH.substring(0, FILE_PATH.lastIndexOf("/")) + "/" + DES_FILE_NAME);
 				file.createNewFile();
 				FileOutputStream fileStream = new FileOutputStream(file);
 				bytesOutputOfSegment = cipher.doFinal(FILE_BYTES);
 				fileStream.write(bytesOutputOfSegment);
 				fileStream.flush();
-//				int progressBarValue = 0;
-//				int from;
-//				int to;
-//				System.out.println("Please wait!");
-//				while (progressBarValue < 101) {
-//					from = (int)FILE_SEGMENT*progressBarValue;
-//					to = (int)FILE_SEGMENT*(progressBarValue + 1);
-//					bytesOutputOfSegment = cipher.doFinal(Arrays.copyOfRange(FILE_BYTES, from, to));
-//					fileStream.write(bytesOutputOfSegment);
-//					fileStream.flush();
-//					progressBarValue ++;							
-//				}
-//				if( progressBarValue == 100) {
-//					from = (int)FILE_SEGMENT*100;
-//					to = (int)(FILE_SIZE - FILE_SEGMENT*100);
-//					bytesOutputOfSegment = cipher.doFinal(Arrays.copyOfRange(FILE_BYTES, from, from + to));
-//					fileStream.write(bytesOutputOfSegment);
-//					myProgressBar.setValue(100);
-//				}
+
 				fileStream.close();
-				System.out.println("Execution completed :D");
 			}
 		} catch (IOException e) {
 		}

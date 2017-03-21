@@ -52,9 +52,15 @@ public class MainForm extends JFrame {
 		btnDes.setBounds(44, 10, 100, 47);
 		contentPane.add(btnDes);
 		
-		JButton btnAES = new JButton("AES");
-		btnAES.setBounds(227, 10, 117, 47);
-		contentPane.add(btnAES);
+		JButton btnRSA = new JButton("RSA");
+		btnRSA.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new RSAForm().setVisible(true);
+				dispose();
+			}
+		});
+		btnRSA.setBounds(44, 69, 100, 47);
+		contentPane.add(btnRSA);
 		
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
@@ -65,6 +71,16 @@ public class MainForm extends JFrame {
 		});
 		btnExit.setBounds(227, 219, 117, 29);
 		contentPane.add(btnExit);
+		
+		JButton btnCheckFile = new JButton("Check File");
+		btnCheckFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new CheckFileForm().setVisible(true);
+				dispose();
+			}
+		});
+		btnCheckFile.setBounds(44, 128, 100, 47);
+		contentPane.add(btnCheckFile);
 		
 		
 	}

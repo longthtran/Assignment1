@@ -3,27 +3,25 @@ package assignment1.MyForms;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.Path;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-//import java.security.SecureRandom;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,28 +32,18 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-public class RSAForm extends JFrame{
+public class RSAForm extends JFrame {
+
 	private JPanel contentPane;
+	private JLabel lblKey;
+	private JLabel lblPrivateKeyFile;
 	private JTextField keyTextField;
-	private JTextField inputTextField;
-	private JTextField outputTextField;
-	private JComboBox<String> myComboBox;
-	private JProgressBar myProgressBar;
-	private ButtonGroup myGroupButton;
-	//
-	private String n_value;
-	private String e_value;
-	private String d_value;
-	private String PLAIN_FILE_NAME = "";
-	private String ENCRYPTED_FILE_NAME= "";
-	private boolean isEncrypted = true;
-	private String filePath = "";
-	private String DES_MODE;
-	private String DES_OPT;
-	private final int DES_ENCRYPT = 1;
-	private final int DES_DECRYPT = 0;
-	//
-	private byte[] inputByteArray;
+	private JTextField pathTextField;
+    private JTextField privateKeyTextField;
+	private JButton btnPrivateKey;
+	private JProgressBar progressBar;
+	private ButtonGroup groupButton;
+	
 	private BigInteger p;
     private BigInteger q;
     private BigInteger N;
@@ -64,87 +52,19 @@ public class RSAForm extends JFrame{
     private BigInteger d;
     private int bitlength =1024;
     private Random r;
-    public RSAForm(){
-    	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    private String  plainFileName;
+    private String plainFilePath;
+	/**
+	 * Create the frame.
+	 */
+	public RSAForm() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-
-		JLabel lblNewLabel = new JLabel("Key lenght");
-		lblNewLabel.setBounds(26, 21, 61, 16);
-		contentPane.add(lblNewLabel);
-
-		JLabel lblInput = new JLabel("Input");
-		lblInput.setBounds(26, 49, 61, 16);
-		contentPane.add(lblInput);
-
-
-		JLabel lblOutput = new JLabel("Output");
-		lblOutput.setBounds(26, 105, 61, 16);
-		contentPane.add(lblOutput);
-
-		keyTextField = new JTextField();
-		keyTextField.setBackground(Color.LIGHT_GRAY);
-		keyTextField.setEditable(false);
-		keyTextField.setBounds(99, 16, 230, 26);
-		contentPane.add(keyTextField);
-		keyTextField.setColumns(10);
-
-		inputTextField = new JTextField();
-		inputTextField.setEditable(false);
-		inputTextField.setColumns(10);
-		inputTextField.setBounds(99, 44, 230, 26);
-		contentPane.add(inputTextField);
-
-		outputTextField = new JTextField();
-		outputTextField.setEditable(false);
-		outputTextField.setColumns(10);
-		outputTextField.setBounds(99, 100, 230, 26);
-		contentPane.add(outputTextField);
-
-		JButton btnExecute = new JButton("Execute");
-		/*btnExecute.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					ENCRYPTED_FILE_NAME = PLAIN_FILE_NAME + "_encrypted";
-					DES_OPT = myGroupButton.getSelection().getActionCommand();
-					byte[] output_res;
-					byte[] fileInByte;
-					//TO-DO: convert file to byte
-					if (filePath.isEmpty()) {
-						JOptionPane.showMessageDialog(contentPane, "Please select file to encrypt!");
-					}
-					else if (DES_OPT.equals("Encrypt") && keyTextField.getText().isEmpty()) {
-						KeyGenerator keyGenerator = KeyGenerator.getInstance("DES");
-						key = keyGenerator.generateKey();
-						keyTextField.setText(new String(key.getEncoded()));
-						JOptionPane.showMessageDialog(contentPane, "You haven't clicked \"Generate Key\" button, so we generate the key for you :)");
-					}
-					else  {
-						if (DES_OPT.equals("EnCrypt"))
-							output_res=encrypt(fileInByte);
-						else output_res=decrypt(fileInByte);
-					}
-				} catch (InvalidKeyException e1) {
-					System.out.println("Key is invalid");
-					e1.printStackTrace();
-				} catch (NoSuchAlgorithmException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (NoSuchPaddingException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});*/
-		btnExecute.setBounds(43, 218, 171, 45);
-		contentPane.add(btnExecute);
-
+		
 		JButton btnReturnMainForm = new JButton("Go back");
 		btnReturnMainForm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -154,7 +74,7 @@ public class RSAForm extends JFrame{
 		});
 		btnReturnMainForm.setBounds(241, 226, 117, 29);
 		contentPane.add(btnReturnMainForm);
-
+		
 		JButton btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -164,110 +84,202 @@ public class RSAForm extends JFrame{
 		});
 		btnExit.setBounds(358, 226, 74, 29);
 		contentPane.add(btnExit);
-
-		JProgressBar progressBar = new JProgressBar();
-		progressBar.setBounds(52, 194, 376, 20);
-		contentPane.add(progressBar);
-		myProgressBar = progressBar;
 		
-		JButton btnOpenFile = new JButton("Open File");
-		btnOpenFile.addActionListener(new ActionListener() {
+		lblKey = new JLabel("Key length");
+		lblKey.setBounds(30, 21, 87, 16);
+		contentPane.add(lblKey);
+		
+		keyTextField = new JTextField();
+		keyTextField.setText("2048");
+		keyTextField.setBounds(140, 16, 148, 26);
+		contentPane.add(keyTextField);
+		keyTextField.setColumns(10);
+		keyTextField.setEditable(true);
+		keyTextField.setBackground(Color.WHITE);
+		
+		JLabel lblNewLabel = new JLabel("Path");
+		lblNewLabel.setBounds(30, 49, 61, 16);
+		contentPane.add(lblNewLabel);
+		
+		pathTextField = new JTextField();
+		pathTextField.setEditable(false);
+		pathTextField.setBounds(140, 44, 148, 26);
+		contentPane.add(pathTextField);
+		pathTextField.setColumns(10);
+		
+		JButton btnExecute = new JButton("Execute");
+		btnExecute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				isEncrypted = true;
-				JFileChooser fileChooser = new JFileChooser();
-				if (fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
-					filePath = file.getAbsolutePath();
-					//
-					Path path = Paths.get(filePath);
-					try {
-						inputByteArray = Files.readAllBytes(path);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					//
-					inputTextField.setText(filePath);
-					PLAIN_FILE_NAME = file.getName();
-				}
-				//fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-				
-			}
-		});
-		btnOpenFile.setBounds(209, 153, 90, 29);
-		contentPane.add(btnOpenFile);
-		
-		JButton btnOpenFolder = new JButton("Open folder");
-		btnOpenFolder.setBounds(311, 153, 117, 29);
-		contentPane.add(btnOpenFolder);
-		
-		JButton btnGenerateKey = new JButton("Generate Key");
-		/*btnGenerateKey.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+				//RSAForm1 rsa = new RSAForm1();
 				try {
-					//get key length value and generate
-					int bitlength=Integer.parseInt(keyTextField.getText());
-					generateKey(bitlength);
-					// TO-DO: write to file
-				} catch (NoSuchAlgorithmException e1) {
+					
+					Path path = Paths.get(pathTextField.getText());
+			        byte[] data = Files.readAllBytes(path);
+					
+					/*
+					 * Encrypt here
+					 * ./outputFolderName/<file_execute>
+					 */
+					if(groupButton.getSelection().getActionCommand().equals("Encrypt")) {
+						DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+						Date date = new Date();
+						String outputFolderName = dateFormat.format(date);
+						File outputFolder;
+						if(System.getProperties().getProperty("os.name").contains("Windows")) {
+							outputFolder = new File(plainFilePath.substring(0, plainFilePath.lastIndexOf("\\")) + "\\" + outputFolderName);
+							outputFolder.mkdir();
+							plainFilePath = plainFilePath.substring(0, plainFilePath.lastIndexOf("\\")) + "\\" + outputFolderName + "\\";					
+						}
+						else {
+							outputFolder = new File(plainFilePath.substring(0, plainFilePath.lastIndexOf("/")) + "/" + outputFolderName);
+							outputFolder.mkdir();
+							plainFilePath = plainFilePath.substring(0, plainFilePath.lastIndexOf("/")) + "/" + outputFolderName + "/";
+						}
+						int keyLength = Integer.parseInt(keyTextField.getText());
+						generateKey(keyLength);
+						byte[] encrypted = encrypt(data);
+			        	String pathEncryptedFile = plainFilePath + plainFileName + "_Encrypt";
+				        //write to file
+				        Path pathOfEncryptedFile = Paths.get(pathEncryptedFile);
+				        Files.write(pathOfEncryptedFile,encrypted);
+					}
+					/*
+					 * Decrypt here
+					 * ./<file_execute>
+					 */
+			        else if (groupButton.getSelection().getActionCommand().equals("Decrypt")) {				       
+				        String pathDecryptedFile = plainFilePath + "_Decrypt";
+				        String pathPrivateKeyFile = privateKeyTextField.getText();
+				        ObjectInputStream in = new ObjectInputStream(new FileInputStream(pathPrivateKeyFile));
+				        @SuppressWarnings("unchecked")
+						List<byte[]> pkList = (List<byte[]> ) in.readObject();
+				        N = new BigInteger(pkList.get(0));			       
+				        d = new BigInteger(pkList.get(1));
+				        in.close();
+				        /*
+				        File privateKeyFile = new File(pathPrivateKeyFile);
+				        BufferedReader br = new BufferedReader(new FileReader(privateKeyFile));
+				        String nString = br.readLine();
+				        br.readLine();
+				        String dString = br.readLine();
+				        // convert byte[] to big integer
+				        N = new BigInteger(Base64.getDecoder().decode(nString));
+				        d = new BigInteger(Base64.getDecoder().decode(dString));
+				        br.close();
+				        */
+				        Path pathOfDecryptedFile = Paths.get(pathDecryptedFile);
+				        byte[] decrypted = decrypt(data);
+				        Files.write(pathOfDecryptedFile,decrypted);
+			        }
+			        
+				} catch (NumberFormatException e1) {
+					JOptionPane.showMessageDialog(contentPane, "Please provide a valid key length");
+					e1.printStackTrace();
+				}
+				catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+		        
+		        
+		        
+		        
 			}
-		});*/
-		btnGenerateKey.setBounds(329, 16, 115, 29);
-		contentPane.add(btnGenerateKey);
+		});
+		btnExecute.setBounds(30, 226, 117, 29);
+		contentPane.add(btnExecute);
 		
-		JButton btnReveal = new JButton("Reveal File");
-		btnReveal.setBounds(327, 100, 117, 29);
-		contentPane.add(btnReveal);
-		
-		JRadioButton rdbtnEncryptButton = new JRadioButton("Encrypt");
-		rdbtnEncryptButton.setActionCommand("Encrypt");
-		rdbtnEncryptButton.setSelected(true);
-		rdbtnEncryptButton.setBounds(26, 129, 141, 23);
-		contentPane.add(rdbtnEncryptButton);
-		rdbtnEncryptButton.addActionListener(new ActionListener() {
+		JRadioButton rdbtnEncrypt = new JRadioButton("Encrypt");
+		rdbtnEncrypt.setSelected(true);
+		rdbtnEncrypt.setActionCommand("Encrypt");
+		rdbtnEncrypt.setBounds(36, 116, 141, 23);
+		contentPane.add(rdbtnEncrypt);
+		rdbtnEncrypt.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				lblPrivateKeyFile.setVisible(false);
+				privateKeyTextField.setVisible(false);
+				btnPrivateKey.setVisible(false);
+				keyTextField.setEditable(true);
+				keyTextField.setBackground(Color.WHITE);
+			}
+		});
+		
+		JRadioButton rdbtnDecrypt = new JRadioButton("Decrypt");
+		rdbtnDecrypt.setActionCommand("Decrypt");
+		rdbtnDecrypt.setBounds(36, 151, 141, 23);
+		contentPane.add(rdbtnDecrypt);
+		rdbtnDecrypt.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				lblPrivateKeyFile.setVisible(true);
+				privateKeyTextField.setVisible(true);
+				btnPrivateKey.setVisible(true);
 				keyTextField.setEditable(false);
 				keyTextField.setBackground(Color.LIGHT_GRAY);
 			}
 		});
 		
-		JRadioButton rdbtnDecryptButton = new JRadioButton("Decrypt");
-		rdbtnDecryptButton.setActionCommand("Decrypt");
-		rdbtnDecryptButton.setBounds(26, 154, 141, 23);
-		contentPane.add(rdbtnDecryptButton);
-		rdbtnDecryptButton.addActionListener(new ActionListener() {
-			
-			@Override
+		groupButton = new ButtonGroup();
+		groupButton.add(rdbtnEncrypt);
+		groupButton.add(rdbtnDecrypt);
+		
+		JButton btnFile = new JButton("Select file");
+		btnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				keyTextField.setEditable(true);
-				keyTextField.setBackground(Color.WHITE);
+				JFileChooser fileChooser = new JFileChooser();
+				if (fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					pathTextField.setText(file.getAbsolutePath());
+					plainFileName = file.getName();
+					plainFilePath = pathTextField.getText();
+					if(plainFileName.contains(".")) plainFileName = plainFileName.substring(0, plainFileName.lastIndexOf('.'));
+				}
 			}
 		});
-			
-		ButtonGroup groupButton = new ButtonGroup();
-		groupButton.add(rdbtnEncryptButton);
-		groupButton.add(rdbtnDecryptButton);
-		myGroupButton = groupButton;
-
+		btnFile.setBounds(189, 163, 117, 29);
+		contentPane.add(btnFile);
 		
-    }
-	//set value of public key or private key
-    public RSAForm(BigInteger e, BigInteger d, BigInteger N)
-    {
-        this.e = e;
-        this.d = d;
-        this.N = N;
-    }
-	//
-    public void generateKey(int bitlen) throws IOException
+		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
+		progressBar.setBounds(52, 188, 376, 26);
+		contentPane.add(progressBar);
+		
+		lblPrivateKeyFile = new JLabel("Private key file");
+		lblPrivateKeyFile.setBounds(30, 77, 106, 16);
+		lblPrivateKeyFile.setVisible(false);
+		contentPane.add(lblPrivateKeyFile);
+		
+		privateKeyTextField = new JTextField();
+		privateKeyTextField.setEditable(false);
+		privateKeyTextField.setBounds(140, 72, 148, 26);
+		contentPane.add(privateKeyTextField);
+		privateKeyTextField.setColumns(10);
+		privateKeyTextField.setVisible(false);
+		
+		btnPrivateKey = new JButton("...");
+		btnPrivateKey.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+				if (fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+					if(file.getName().equals("PrivateKey.txt")) {
+						privateKeyTextField.setText(file.getAbsolutePath());
+					}
+					else JOptionPane.showMessageDialog(contentPane, "Please select a file named \"PrivateKey.txt\".");
+				}
+			}
+		});
+		btnPrivateKey.setBounds(290, 72, 42, 29);
+		btnPrivateKey.setVisible(false);
+		contentPane.add(btnPrivateKey);
+	}
+	private void generateKey(int bitlen) throws IOException
     {
     	r = new Random();
         bitlength = bitlen;
@@ -283,63 +295,58 @@ public class RSAForm extends JFrame{
         }
         //d= e^-1 mod phi
         d = e.modInverse(phi);
-        //private key
-        createKeyFile(N,e);
         //public key
-        createKeyFile(N,d);
+        createKeyFile(N, e, "PublicKey.txt");
+        //private key
+        createKeyFile(N, d, "PrivateKey.txt");
     }
-    public void createKeyFile(BigInteger n,BigInteger eod) throws IOException{
-    	String pk1 = new String(n.toByteArray());
-    	Path pathOfEncryptedFile = Paths.get("/home/pi/pk1");
-    	FileWriter fileWriter = new FileWriter(new File("/home/pi/pk1"));
+	public void createKeyFile(BigInteger n,BigInteger eod, String fileName) throws IOException{
+    	//String firstResult = Base64.getEncoder().encodeToString(n.toByteArray());
+    	//String secondResult = Base64.getEncoder().encodeToString(eod.toByteArray());
+    	String osName = System.getProperties().getProperty("os.name");
+    	String pathInfo;
+    	if(osName.contains("Windows")) {
+    		pathInfo = plainFilePath.substring(0, plainFilePath.lastIndexOf("\\")) + "\\" + fileName;
+    	}
+    	else pathInfo = plainFilePath.substring(0, plainFilePath.lastIndexOf("/")) + "/" + fileName;
+    	List<byte[]> list = new ArrayList<>();
+    	list.add(n.toByteArray());
+    	list.add(eod.toByteArray());
+    	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(pathInfo));
+    	out.writeObject(list);
+    	out.close();
+    	/*
+    	File info = new File(pathInfo);
+    	info.createNewFile();
+    	FileWriter fileWriter = new FileWriter(new File(pathInfo));
     	BufferedWriter bw = new BufferedWriter(fileWriter);
-    	bw.write(pk1);
+    	bw.write(firstResult);
+    	bw.newLine();
+    	bw.write("*******");
+    	bw.newLine();
+    	if(fileName.equals("PublicKey.txt")) bw.write(secondResult);
+    	else bw.write(secondResult);
     	bw.newLine();
     	bw.close();
+    	*/
     }
-    public static void main(String[] args) throws IOException
-    {
-        RSAForm rsa = new RSAForm();
-        rsa.generateKey(2048);
-        DataInputStream in = new DataInputStream(System.in);
-        String teststring;
-        System.out.println("Enter the plain text:");
-        teststring = in.readLine();
-        Path path  =Paths.get(teststring);
-        byte[] data = Files.readAllBytes(path);
-        System.out.println("Encrypting String: " + teststring);
-        System.out.println("String in Bytes: "
-                + bytesToString(teststring.getBytes()));
-        // encrypt
-        byte[] encrypted = rsa.encrypt(data);
-        //write to file
-        Path pathOfEncryptedFile = Paths.get("/home/pi/testass2");
-        Files.write(pathOfEncryptedFile,encrypted);
-        // decrypt
-        byte[] decrypted = rsa.decrypt(encrypted);
-        //write to file
-        Path pathOfDecryptedFile = Paths.get("/home/pi/testass3");
-        Files.write(pathOfDecryptedFile,decrypted);
-        
-        System.out.println("Decrypting Bytes: " + bytesToString(decrypted));
-        System.out.println("Decrypted String: " + new String(decrypted));
-    }
-    private static String bytesToString(byte[] encrypted)
-    {
-        String test = "";
-        for (byte b : encrypted)
-        {
-            test += Byte.toString(b);
-        }
-        return test;
-    }
-    // Encrypt message
-    public byte[] encrypt(byte[] message)
+//	private static String bytesToString(byte[] encrypted)
+//    {
+//        String test = "";
+//        for (byte b : encrypted)
+//        {
+//            test += Byte.toString(b);
+//        }
+//        return test;
+//    }
+	private byte[] encrypt(byte[] message)
     {
         return (new BigInteger(message)).modPow(e, N).toByteArray();
     }
-    // Decrypt message
-    public byte[] decrypt(byte[] message)
+    /*
+     *  Decrypt message
+     */
+    private byte[] decrypt(byte[] message)
     {
         return (new BigInteger(message)).modPow(d, N).toByteArray();
     }
