@@ -39,6 +39,7 @@ public class CheckFileForm extends JFrame {
 	 * Create the frame.
 	 */
 	public CheckFileForm() {
+		setTitle("Hashing algorithm");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 733, 300);
 		contentPane = new JPanel();

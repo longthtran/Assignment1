@@ -60,6 +60,7 @@ public class DESForm extends JFrame {
 	 * Create the frame.
 	 */
 	public DESForm() {
+		setTitle("DES Encrypting");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -385,6 +386,7 @@ public class DESForm extends JFrame {
 				lblKeyPath.setVisible(false);
 				keyPathTextField.setVisible(false);
 				btnKeyPath.setVisible(false);
+				setTitle("DES Encrypting");
 			}
 		});
 		
@@ -396,6 +398,7 @@ public class DESForm extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setTitle("DES Decrypting");
 				lblKeyPath.setVisible(true);
 				keyPathTextField.setVisible(true);
 				btnKeyPath.setVisible(true);

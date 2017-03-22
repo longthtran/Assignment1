@@ -21,6 +21,7 @@ public class MainForm extends JFrame {
 			public void run() {
 				try {
 					MainForm frame = new MainForm();
+					frame.setTitle("Welcome to BKEDT");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

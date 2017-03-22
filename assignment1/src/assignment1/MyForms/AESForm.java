@@ -62,6 +62,7 @@ public class AESForm extends JFrame {
 	 * Create the frame.
 	 */
 	public AESForm() {
+		setTitle("AES Encrypting");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -385,6 +386,7 @@ public class AESForm extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setTitle("AES Encrypting");
 				lblKeyPath.setVisible(false);
 				lblKeyLength.setVisible(true);
 				keyPathTextField.setVisible(false);
@@ -401,6 +403,7 @@ public class AESForm extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setTitle("AES Decrypting");
 				lblKeyPath.setVisible(true);
 				lblKeyLength.setVisible(false);
 				keyPathTextField.setVisible(true);
