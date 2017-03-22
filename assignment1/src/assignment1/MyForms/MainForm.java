@@ -85,7 +85,7 @@ public class MainForm extends JFrame {
 		JButton btnAES = new JButton("AES");
 		btnAES.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new AESForm1().setVisible(true);
+				new AESForm().setVisible(true);
 				dispose();
 			}
 		});

@@ -1,5 +1,6 @@
 package assignment1.MyForms;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
@@ -15,15 +16,12 @@ import java.nio.file.Paths;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -44,9 +42,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.xml.bind.DatatypeConverter;
 
-public class AESForm1 extends JFrame {
+public class AESForm extends JFrame {
 
 	private JPanel contentPane;
 	private ButtonGroup buttonGroup;
@@ -58,11 +55,13 @@ public class AESForm1 extends JFrame {
 	private JTextField keyPathTextField;
 	private JLabel lblKeyPath;
 	private JLabel lblKeyLength;
+	private JLabel lblNote;
+	private JLabel lblNoteName;
 	private JButton btnKeyPath;
 	/**
 	 * Create the frame.
 	 */
-	public AESForm1() {
+	public AESForm() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -305,7 +304,6 @@ public class AESForm1 extends JFrame {
 							}
 							//execute many files
 							else {
-								JOptionPane.showMessageDialog(contentPane, "You decrypt all files named ends with _\"encrypt\" inside the selected folder.");
 								File selectedFolder = new File(pathFileTextField.getText());
 								if(selectedFolder.isDirectory()) {
 									File[] listOfFiles = selectedFolder.listFiles();
@@ -325,7 +323,7 @@ public class AESForm1 extends JFrame {
 									}
 									else cipher.init(Cipher.DECRYPT_MODE, secretKey);
 									in.close();
-									
+									JOptionPane.showMessageDialog(contentPane, "You decrypt all files named ends with _\"encrypt\" inside the selected folder.");
 									for(File file: listOfFiles) {
 										//avoid system file, ex: .DS_store
 										if(file.getName().charAt(0) == '.' || file.isDirectory() || !file.getName().endsWith("_encrypt"))
@@ -363,7 +361,7 @@ public class AESForm1 extends JFrame {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						} catch (BadPaddingException e1) {
-							// TODO Auto-generated catch block
+							JOptionPane.showMessageDialog(contentPane, "You have selected wrong key file or mode!");
 							e1.printStackTrace();
 						}
 					}
@@ -420,6 +418,7 @@ public class AESForm1 extends JFrame {
 		contentPane.add(lblNewLabel);
 		
 		pathFileTextField = new JTextField();
+		pathFileTextField.setEditable(false);
 		pathFileTextField.setBounds(133, 13, 242, 26);
 		contentPane.add(pathFileTextField);
 		pathFileTextField.setColumns(10);
@@ -427,6 +426,8 @@ public class AESForm1 extends JFrame {
 		JButton btnSelectFile = new JButton("Select file");
 		btnSelectFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				lblNoteName.setVisible(true);
+				lblNote.setVisible(false);
 				isSelectedFolder = false;
 				JFileChooser fileChooser = new JFileChooser();
 				if(fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
@@ -458,6 +459,7 @@ public class AESForm1 extends JFrame {
 		JButton btnSelectFolder = new JButton("Select folder");
 		btnSelectFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				lblNote.setVisible(true);
 				isSelectedFolder = true;
 				JFileChooser folderChooser = new JFileChooser();
 				folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -489,8 +491,8 @@ public class AESForm1 extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				if(fileChooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
-					if(!file.getName().equals("key.txt")) 
-						JOptionPane.showMessageDialog(contentPane, "Please provide a file named \"key.txt\"");
+					if(!file.getName().contains("key")) 
+						JOptionPane.showMessageDialog(contentPane, "Please provide file key");
 					else keyPathTextField.setText(file.getAbsolutePath());
 				}
 			}
@@ -498,8 +500,20 @@ public class AESForm1 extends JFrame {
 		btnKeyPath.setBounds(384, 67, 48, 29);
 		btnKeyPath.setVisible(false);
 		contentPane.add(btnKeyPath);
+		
+		lblNote = new JLabel("<html>Please dont put any subfolders under your selected folder!</html>");
+		lblNote.setForeground(Color.RED);
+		lblNote.setBounds(167, 107, 253, 40);
+		lblNote.setVisible(false);
+		contentPane.add(lblNote);
+		
+		lblNoteName = new JLabel("Please dont put any symbol \"\\\" or \"/\" in your files' name");
+		lblNoteName.setForeground(Color.BLUE);
+		lblNoteName.setVisible(false);
+		lblNoteName.setBounds(43, 194, 377, 16);
+		contentPane.add(lblNoteName);
 	}
-	private byte[] encrypt(String pathOfExecutedFile, SecretKey secretKey, Cipher cipher) throws IOException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+	private byte[] encrypt(String pathOfExecutedFile, SecretKey secretKey, Cipher cipher) throws IOException, IllegalBlockSizeException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException {
 
 		byte[] keyToBytes = secretKey.getEncoded();
 		System.out.println("You encrypt with key " + keyToBytes.length + " bytes.");
@@ -508,7 +522,7 @@ public class AESForm1 extends JFrame {
 		return cipherBytes;
 	}
 	private byte[] decrypt(String pathOfExecutedFile, Cipher cipher) throws IOException, IllegalBlockSizeException, BadPaddingException {
-		
+
 		byte[] data = Files.readAllBytes(Paths.get(pathOfExecutedFile));
 		byte[] cipherBytes = cipher.doFinal(data);
 		return cipherBytes;

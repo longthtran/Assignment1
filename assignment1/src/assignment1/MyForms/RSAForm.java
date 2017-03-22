@@ -13,10 +13,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -125,9 +122,10 @@ public class RSAForm extends JFrame {
 						if (checkFileSize(pathTextField.getText(), keyLength)) {
 							JOptionPane.showMessageDialog(contentPane, "File 's size must not bigger than key length");
 						} else {
-							DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-							Date date = new Date();
-							String outputFolderName = dateFormat.format(date);
+							//DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+							//Date date = new Date();
+							//String outputFolderName = dateFormat.format(date);
+							String outputFolderName = "RSA_transformKey";
 							File outputFolder;
 							if (System.getProperties().getProperty("os.name").contains("Windows")) {
 								outputFolder = new File(plainFilePath.substring(0, plainFilePath.lastIndexOf("\\"))
