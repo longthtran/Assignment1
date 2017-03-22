@@ -79,10 +79,19 @@ public class MainForm extends JFrame {
 				dispose();
 			}
 		});
-		btnCheckFile.setBounds(44, 128, 100, 47);
+		btnCheckFile.setBounds(44, 201, 100, 47);
 		contentPane.add(btnCheckFile);
+		
+		JButton btnAES = new JButton("AES");
+		btnAES.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new AESForm1().setVisible(true);
+				dispose();
+			}
+		});
+		btnAES.setBounds(44, 142, 100, 47);
+		contentPane.add(btnAES);
 		
 		
 	}
-
 }
