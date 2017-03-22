@@ -57,11 +57,11 @@ public class TestSwingWorker {
             protected Void doInBackground() throws Exception {
             	//change directory to run
             	//input to encrypt
-            	String inputFile = "/home/pi/lab2.pdf";
+            	String inputFile = "/Users/long-tran/Documents/it.json";
             	//output file of encryption / input file of decryption
-        		String outputFile = "/home/pi/lab2after";
+        		String outputFile = "/Users/long-tran/Documents/itafter";
         		//output file of decryption - not used yet
-        		String outputFileAll = "/home/pi/lab2afterall.pdf";
+        		String outputFileAll = "/Users/long-tran/Documents/itafterall";
         		//encryption
         		File f = new File(inputFile);
         		long fileSize = f.length();// byte
