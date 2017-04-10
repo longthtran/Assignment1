@@ -98,7 +98,7 @@ public class MainForm extends JFrame {
 		contentPane.add(btnAES);
 		
 		JLabel lblNewLabel = new JLabel("");
-		Image img = new ImageIcon(this.getClass().getResource("/ok.png")).getImage();
+		Image img = new ImageIcon(this.getClass().getResource("/img/ok.png")).getImage();
 		lblNewLabel.setIcon(new ImageIcon(img));
 		lblNewLabel.setBounds(0, 0, 434, 262);
 		contentPane.add(lblNewLabel);
